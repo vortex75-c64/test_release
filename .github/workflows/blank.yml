@@ -1,15 +1,13 @@
-name: Bump version
+name: Create/update tag
 on:
   push:
-    branches:
-      - master
+    branch: "main"
 jobs:
-  build:
+  create-tag:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - name: Bump version and push tag
-        uses: laputansoft/github-tag-action@v4.6
+      - uses: actions/checkout@v3
+      - uses: rickstaa/action-create-tag@v1
         with:
-          github_token: ${{ env.github-token }}
-          tag: ${{ steps.package-version.outputs.version }}
+          tag: "latest"
+          message: "Latest release"
