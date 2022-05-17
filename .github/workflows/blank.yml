@@ -1,17 +1,39 @@
-name: Bump version
+# .github/workflows/release.yml:
+name: Release
+
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'bump type, major or minor or patch or empty string'
+        default: ''
+      dry_run:
+        description: 'dry run, true or false'
+        default: 'false'
+      draft:
+        description: 'draft, true or false'
+        default: 'false'
+      pre_release:
+        description: 'pre release, true or false'
+        default: 'false'
+
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Bump version and push tag
-      uses: anothrNick/github-tag-action@1.36.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        WITH_V: false
-        DEFAULT_BUMP: major
-        INITIAL_VERSION: 1.0.0
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - run: npm install
+      - run: npm run build
+      - run: npm run test
+      - uses: MeilCli/bump-release-action@v1
+        with:
+          config_path: '.github/bump.yml'
+          bump: ${{ github.event.inputs.bump }}
+          dry_run: ${{ github.event.inputs.dry_run }}
+          draft: ${{ github.event.inputs.draft }}
+          pre_release: ${{ github.event.inputs.pre_release }}
