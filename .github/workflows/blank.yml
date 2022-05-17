@@ -1,39 +1,29 @@
-# .github/workflows/release.yml:
-name: Release
-
 on:
-  workflow_dispatch:
-    inputs:
-      bump:
-        description: 'bump type, major or minor or patch or empty string'
-        default: ''
-      dry_run:
-        description: 'dry run, true or false'
-        default: 'false'
-      draft:
-        description: 'draft, true or false'
-        default: 'false'
-      pre_release:
-        description: 'pre release, true or false'
-        default: 'false'
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+name: Create Release
 
 jobs:
-  release:
+  build:
+    name: Create Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@master
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-      - run: npm install
-      - run: npm run build
-      - run: npm run test
-      - uses: MeilCli/bump-release-action@v1
-        with:
-          config_path: '.github/bump.yml'
-          bump: ${{ github.event.inputs.bump }}
-          dry_run: ${{ github.event.inputs.dry_run }}
-          draft: ${{ github.event.inputs.draft }}
-          pre_release: ${{ github.event.inputs.pre_release }}
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this Release
+            - First Change
+            - Second Change
+          draft: false
+          prerelease: false
