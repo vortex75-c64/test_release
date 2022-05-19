@@ -1,13 +1,12 @@
-name: Create/update tag
-on:
-  push:
-    branch: "main"
+on: push
+name: Release
 jobs:
-  create-tag:
+  release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: rickstaa/action-create-tag@v1
+      - name: Create GitHub release
+        uses: Roang-zero1/github-create-release-action@master
         with:
-          tag: "latest"
-          message: "Latest release"
+          version_regex: ^v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
